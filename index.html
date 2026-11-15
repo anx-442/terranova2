@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#102a43">
+<title>TERRA NOVA — The SDG Race</title>
+<style>
+:root{
+ --navy:#102a43;--navy2:#183e5b;--blue:#2878a5;--cyan:#bfe7ef;--paper:#f2f6f8;
+ --panel:#fff;--line:#d9e3e9;--muted:#607789;--gold:#efbd4f;--green:#2f8067;
+ --shadow:0 12px 35px rgba(16,42,67,.09);--radius:18px;
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--navy);font:15px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+button,input,select{font:inherit}button{cursor:pointer}
+.topbar{background:linear-gradient(115deg,#102a43,#1e5875);color:#fff;padding:15px 22px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;box-shadow:0 5px 22px #102a4325}
+.brand{display:flex;align-items:center;gap:12px}.brand-mark{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,#f2c45f,#e89b45);display:grid;place-items:center;color:#17324b;font-weight:950;font-size:21px}
+.brand h1{margin:0;font-size:21px;letter-spacing:.14em}.brand p{margin:1px 0 0;color:#c8dce8;font-size:11px;letter-spacing:.12em}
+.top-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+main{max-width:1480px;margin:0 auto;padding:20px;display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:18px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);min-width:0}
+.panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+h2{font-size:17px;margin:0;font-weight:850;letter-spacing:-.02em}h3{font-size:13px;margin:13px 0 7px;color:#31536a}
+.muted{color:var(--muted);font-size:12px}.eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.14em;font-weight:850;color:var(--muted)}
+.btn{border:0;border-radius:11px;background:var(--blue);color:white;padding:10px 14px;font-weight:800;box-shadow:0 3px 0 #185a7c;transition:.12s transform,.12s filter}
+.btn:hover{filter:brightness(1.06);transform:translateY(-1px)}.btn:active{transform:translateY(1px);box-shadow:none}
+.btn:disabled{opacity:.38;cursor:not-allowed;transform:none;box-shadow:none}
+.btn.secondary{background:#e8f0f4;color:#173b54;box-shadow:0 3px 0 #cbdce5}
+.btn.gold{background:#e4aa35;color:#2d2b21;box-shadow:0 3px 0 #bb8321}
+.btn.red{background:#a94444;box-shadow:0 3px 0 #7e3030}
+.btn.green{background:#328267;box-shadow:0 3px 0 #21644e}
+.btn.small{padding:7px 10px;font-size:12px;border-radius:9px}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #e7b646;outline-offset:2px}
+#setup{max-width:760px;margin:42px auto;padding:26px}
+.hero{border-radius:16px;padding:26px;background:linear-gradient(125deg,#12334d,#24617b);color:#fff;margin-bottom:20px;position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;width:190px;height:190px;border:28px solid #ffffff14;border-radius:50%;right:-40px;top:-55px}
+.hero h2{font-size:28px;letter-spacing:.01em}.hero p{color:#d5e7ef;max-width:520px}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+label{display:block;font-size:12px;font-weight:800;margin:0 0 6px}
+input,select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--navy)}
+.player-inputs{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:12px 0}
+#game{display:none}.leftcol,.rightcol{display:flex;flex-direction:column;gap:16px}
+.statusline{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pill{padding:5px 9px;border-radius:30px;background:#edf4f7;color:#31566d;font-size:11px;font-weight:850}
+.turn-pill{background:#fff3d7;color:#76521a}
+.dicebox{display:flex;align-items:center;gap:12px}.die{width:40px;height:40px;border:1px solid #d6e1e7;background:#f6fafb;border-radius:12px;display:grid;place-items:center;font-size:20px;font-weight:900}
+#boardWrap{overflow:auto;padding:20px 12px 24px;background:radial-gradient(ellipse at center,#eaf4ef 0%,#dbeae4 68%,#eef5f3 100%);border-radius:22px;border:1px solid #d4e4dc}
+#board{width:max-content;min-width:0;margin:0 auto;display:grid;grid-template-columns:repeat(5,94px);grid-template-rows:repeat(5,81px);gap:0;align-items:center;justify-items:center}
+.hex{width:94px;height:108px;min-height:0;max-width:none;border:0;border-radius:0;padding:12px 10px;position:relative;display:flex;flex-direction:column;justify-content:space-between;align-items:center;color:#183344;clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);filter:drop-shadow(0 4px 3px #19384a30);transition:filter .18s,transform .18s;cursor:pointer;isolation:isolate}
+.hex:hover{transform:translateY(-3px) scale(1.035);filter:brightness(1.07) drop-shadow(0 7px 5px #19384a40);z-index:5}
+.hex.selected{filter:drop-shadow(0 0 5px #e6a72d) drop-shadow(0 0 9px #e6a72d);z-index:6}
+.hex.owned:before{content:"";position:absolute;inset:4px;border:3px solid var(--owner);clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);pointer-events:none;z-index:3}
+.hex.ruined{filter:grayscale(.85);opacity:.62}
+.hex .terrain{font-size:8px;font-weight:950;letter-spacing:.07em;text-transform:uppercase;text-align:center;line-height:1.1;background:#ffffffdf;padding:4px 7px;border-radius:20px;white-space:normal;max-width:100%;overflow-wrap:anywhere;z-index:2;box-shadow:0 2px 5px #19384a18}
+.hex .tile-icon{font-size:30px;line-height:1.1;filter:drop-shadow(0 2px 2px #0003);z-index:2}
+.hex .tile-bottom{width:100%;display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;z-index:2}
+.hex .owner{font-size:8px;font-weight:950;white-space:normal;overflow-wrap:anywhere;max-width:100%;background:#ffffffed;padding:3px 7px;border-radius:12px;line-height:1.1;box-shadow:0 2px 5px #19384a15}
+.hex .building{font-size:7px;font-weight:850;min-height:9px;color:#28465a;line-height:1.1;max-width:100%;overflow-wrap:anywhere}
+.hex .mini{font-size:7px;opacity:.9}
+.hex[data-terrain="Farmland"]{background:radial-gradient(ellipse at 50% 75%,#fff0a3 0 16%,transparent 17%),repeating-linear-gradient(160deg,transparent 0 12px,#b98c3d35 13px 15px),linear-gradient(145deg,#f8e6a0,#c9a94d)}
+.hex[data-terrain="Forest"]{background:radial-gradient(circle at 22% 72%,#397d50aa 0 8%,transparent 9%),radial-gradient(circle at 76% 30%,#2f774c99 0 10%,transparent 11%),linear-gradient(145deg,#b8e2b8,#55966c)}
+.hex[data-terrain="Mountains"]{background:linear-gradient(150deg,transparent 0 46%,#ffffff75 47% 51%,transparent 52%),linear-gradient(35deg,#879aa7 0 25%,transparent 26%),linear-gradient(145deg,#e4edf1,#879daa)}
+.hex[data-terrain="River/Lake"]{background:repeating-linear-gradient(165deg,transparent 0 13px,#ffffff55 14px 16px),linear-gradient(145deg,#c9f3fa,#54acd0)}
+.hex[data-terrain="Urban"]{background:radial-gradient(circle at 50% 70%,#ffffff50 0 25%,transparent 26%),linear-gradient(145deg,#efd9f1,#a87bb8)}
+.hex[data-terrain="Grassland"]{background:radial-gradient(ellipse at 20% 80%,#f6e9a477 0 15%,transparent 16%),radial-gradient(ellipse at 80% 20%,#ffffff55 0 18%,transparent 19%),linear-gradient(145deg,#e4f2b3,#91b85c)}
+/* Compact Catan-style pointy-top honeycomb: 75% horizontal pitch, 75% vertical pitch. */
+.hex:nth-child(1){grid-row:1;grid-column:2}.hex:nth-child(2){grid-row:1;grid-column:3}.hex:nth-child(3){grid-row:1;grid-column:4}
+.hex:nth-child(n+4):nth-child(-n+7){grid-row:2;transform:translateX(47px)}
+.hex:nth-child(4){grid-column:1}.hex:nth-child(5){grid-column:2}.hex:nth-child(6){grid-column:3}.hex:nth-child(7){grid-column:4}
+.hex:nth-child(n+8):nth-child(-n+12){grid-row:3}
+.hex:nth-child(8){grid-column:1}.hex:nth-child(9){grid-column:2}.hex:nth-child(10){grid-column:3}.hex:nth-child(11){grid-column:4}.hex:nth-child(12){grid-column:5}
+.hex:nth-child(n+13):nth-child(-n+16){grid-row:4;transform:translateX(47px)}
+.hex:nth-child(13){grid-column:1}.hex:nth-child(14){grid-column:2}.hex:nth-child(15){grid-column:3}.hex:nth-child(16){grid-column:4}
+.hex:nth-child(n+17){grid-row:5}
+.hex:nth-child(17){grid-column:2}.hex:nth-child(18){grid-column:3}.hex:nth-child(19){grid-column:4}
+.hex:nth-child(n+4):nth-child(-n+7):hover,.hex:nth-child(n+13):nth-child(-n+16):hover{transform:translate(47px,-3px) scale(1.035)}
+@media(max-width:700px){
+ #board{grid-template-columns:repeat(5,78px);grid-template-rows:repeat(5,67.5px)}
+ .hex{width:78px;height:90px;padding:8px 7px}
+ .hex .tile-icon{font-size:23px}
+ .hex .terrain{font-size:7px}
+ .hex .owner{font-size:7px}
+ .hex:nth-child(n+4):nth-child(-n+7),.hex:nth-child(n+13):nth-child(-n+16){transform:translateX(39px)}
+ .hex:nth-child(n+4):nth-child(-n+7):hover,.hex:nth-child(n+13):nth-child(-n+16):hover{transform:translate(39px,-3px) scale(1.02)}
+}
+.terrain-legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.legend-chip{font-size:10px;background:#f2f6f8;border:1px solid var(--line);padding:4px 7px;border-radius:20px}
+.actiongrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.action-card{border:1px solid var(--line);border-radius:12px;padding:10px;background:#fbfdfe}
+.action-card strong{display:block;font-size:12px}.action-card span{display:block;font-size:10px;color:var(--muted);margin:3px 0 8px}
+.action-card button{width:100%}
+.selected-info{background:#f5f9fb;border:1px solid var(--line);border-radius:12px;padding:12px;font-size:13px;min-height:64px}
+.resource-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px}
+.resource{background:#f2f6f8;border-radius:11px;padding:9px;text-align:center;border:1px solid #e5edf1}
+.resource .rname{font-size:10px;color:var(--muted);font-weight:800}.resource b{font-size:20px;display:block}
+.player-card.eliminated{opacity:.48;filter:grayscale(1)}.player-card{border:1px solid var(--line);border-left:5px solid var(--pc);border-radius:12px;padding:10px;margin:8px 0}
+.player-card.active{background:#f7fbfd;box-shadow:0 0 0 2px var(--pc)}
+.player-head{display:flex;justify-content:space-between;gap:8px;font-size:12px;font-weight:900}
+.track{display:grid;grid-template-columns:50px 1fr 32px;gap:6px;align-items:center;margin:6px 0;font-size:10px}
+.bar{height:7px;border-radius:20px;background:#e4edf1;overflow:hidden}.bar i{display:block;height:100%;background:var(--pc);border-radius:20px}
+.log{max-height:230px;overflow:auto;background:#f5f8fa;border-radius:11px;padding:9px;font-size:11px;color:#476174}
+.log div{padding:4px 2px;border-bottom:1px solid #e7eef2}.log div:last-child{border:0}
+.cardrow{display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px solid var(--line);padding:8px 0;font-size:12px}
+.overlay{position:fixed;inset:0;background:#0b2235b8;display:none;align-items:center;justify-content:center;padding:18px;z-index:20}
+.dialog{width:min(520px,100%);max-height:88vh;overflow:auto;background:#fff;border-radius:18px;padding:20px;box-shadow:0 25px 70px #071a2a55}
+.dialog h2{margin-bottom:8px}.dialog-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:16px}
+#toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#102a43;color:#fff;padding:11px 16px;border-radius:12px;box-shadow:var(--shadow);z-index:40;transition:.2s;font-size:13px;max-width:90vw}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+
+.card-decks{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:12px 0}
+.deck-tile{display:flex;align-items:center;gap:10px;background:#f5f8fa;border:1px solid var(--line);border-radius:12px;padding:9px}
+.deck-back{width:48px;height:64px;border-radius:8px;display:grid;place-content:center;text-align:center;color:#fff;font-weight:950;flex-shrink:0;box-shadow:0 3px 7px #17324b25}
+.deck-back small{font-size:6px;letter-spacing:.08em}.development-back{background:linear-gradient(145deg,#214f6a,#397d91);border:2px solid #b8dbe4}
+.disaster-back{background:linear-gradient(145deg,#803d3d,#c45b45);font-size:28px;border:2px solid #efc2a9}
+.hand-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.game-card{border:1px solid #cbd9e1;border-radius:11px;padding:10px;background:linear-gradient(150deg,#fff,#f1f6f8);box-shadow:0 3px 8px #17324b0b;min-height:94px;display:flex;flex-direction:column;justify-content:space-between}
+.game-card b{font-size:12px}.game-card p{font-size:10px;color:var(--muted);margin:5px 0}.game-card .card-type{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:#2878a5;font-weight:900}
+.disaster-face{border-radius:12px;border:1px solid #e0b8a9;background:linear-gradient(135deg,#fff5ef,#f8e3dc);padding:12px;color:#793b31}
+.disaster-face b{font-size:14px;display:block;margin-bottom:4px}.disaster-face p{font-size:11px;margin:0}
+.played-list{font-size:11px;line-height:1.7;max-height:90px;overflow:auto}
+@media(max-width:620px){.hand-grid{grid-template-columns:1fr}}
+.winner-banner{display:none;background:#fff3d7;border:1px solid #edce7e;padding:13px;border-radius:12px;font-weight:900;color:#72511a;margin-bottom:12px}
+.footer-note{font-size:10px;color:var(--muted);margin-top:10px}
+@media(max-width:1000px){main{grid-template-columns:1fr}.rightcol{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.rightcol .panel:last-child{grid-column:1/-1}}
+
+
+/* Simplified interface and bottom resource-card tray */
+.panel{box-shadow:none;border-radius:14px;padding:15px}
+.panel h2{font-size:18px}
+.panel h3{font-size:14px;margin:14px 0 8px}
+.eyebrow{letter-spacing:.08em}
+.resource-tray{grid-column:1/-1;margin-top:2px}
+ .resource-tray{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);width:min(960px,calc(100vw - 28px));z-index:1000;margin:0;overflow:hidden;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border:1px solid #d8e1e7;border-radius:16px;box-shadow:0 8px 28px #102a3a26}
+.resource-cards{display:flex;align-items:center;justify-content:center;gap:0;min-height:178px;padding:14px 18px 18px;overflow-x:auto;overscroll-behavior-x:contain}
+.resource-card{--card-bg:#2878a5;position:relative;flex:0 0 116px;height:154px;margin-left:-18px;border:3px solid #fff;border-radius:15px;background:var(--card-bg);color:#fff;box-shadow:0 3px 8px #132c3a38;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:10px 7px;transform:rotate(calc((var(--card-index) - 2.5)*1.2deg));transition:transform .16s ease,margin .16s ease;z-index:calc(10 + var(--card-index));}
+.resource-card:first-child{margin-left:0}
+.resource-card:hover{transform:translateY(-13px) rotate(0deg);margin-left:-10px;margin-right:4px;z-index:30}
+.resource-food{--card-bg:#368b58}.resource-water{--card-bg:#2589b8}.resource-timber{--card-bg:#8b5a35}.resource-minerals{--card-bg:#687783}.resource-money{--card-bg:#b17a22}.resource-medicine{--card-bg:#8b5bb0}
+.resource-symbol{font-size:31px;line-height:1.1;filter:drop-shadow(0 1px 1px #0003)}
+.resource-amount{font-size:31px;line-height:1;font-weight:950;text-shadow:0 1px 2px #0003}
+.resource-label{font-size:11px;font-weight:900;letter-spacing:.06em;text-transform:uppercase}
+.card-corner{position:absolute;top:7px;left:9px;font-size:13px;font-weight:900}
+.card-corner.bottom{top:auto;left:auto;bottom:7px;right:9px;transform:rotate(180deg)}
+.resource-card:after{content:"";position:absolute;inset:24% 17%;border:2px solid #ffffff55;border-radius:50%;pointer-events:none}
+.hex .roll{display:none!important}
+.hex{box-shadow:none}
+@media(max-width:760px){.resource-tray{grid-column:1/-1}.resource-cards{justify-content:flex-start;min-height:166px;padding:12px 14px 18px;scrollbar-width:thin}.resource-card{flex-basis:108px;height:146px;margin-left:-23px}.resource-card:first-child{margin-left:0}.resource-card:hover{margin-left:-12px}}
+
+
+body{padding-bottom:215px}
+.resource-tray .panel-head{padding:12px 16px 0}
+.resource-cards{min-height:164px}
+@media(max-width:760px){
+ body{padding-bottom:190px}
+ .resource-tray{left:8px;bottom:8px;transform:none;width:calc(100vw - 16px);border-radius:14px}
+ .resource-tray .panel-head{padding:9px 12px 0}
+ .resource-cards{min-height:150px;padding:10px 12px 14px}
+ .resource-card{flex-basis:100px;height:132px}
+}
+
+
+.resource-tray.minimized{padding:8px 12px}
+.resource-tray.minimized .resource-cards{display:none}
+.resource-tray.minimized .panel-head{margin:0;padding:0}
+body.hand-minimized{padding-bottom:76px}
+.sync-panel textarea{font:12px/1.4 ui-monospace,SFMono-Regular,monospace;overflow-wrap:anywhere}
+
+
+
+#disasterFX{position:fixed;inset:0;z-index:2500;pointer-events:none;display:none;align-items:center;justify-content:center;overflow:hidden}
+#disasterFX.active{display:flex;animation:disasterFade 3.5s ease forwards}
+.disaster-scrim{position:absolute;inset:0;background:#07182730}
+.disaster-wash{position:absolute;inset:-12%;opacity:.82;transform:translateY(110%);animation:washRise 3.2s ease-out forwards}
+#disasterFX.flood .disaster-wash{background:repeating-linear-gradient(165deg,#35b8e8aa 0 10px,#087db8bb 12px 24px,#b9f1ff88 27px 32px);animation:washRise 3.1s ease-out forwards}
+#disasterFX.wildfire .disaster-wash{background:radial-gradient(ellipse at 20% 90%,#ffb02eaa,transparent 38%),radial-gradient(ellipse at 80% 90%,#e43b1aaa,transparent 42%),linear-gradient(0deg,#8e230a66,transparent 75%);animation:fireRise 3.2s ease-out forwards}
+#disasterFX.drought .disaster-wash,#disasterFX.heatwave .disaster-wash{background:radial-gradient(ellipse at 50% 110%,#ffcb4b99,transparent 65%),linear-gradient(0deg,#a94c1770,transparent 75%);animation:heatPulse 3.3s ease-in-out forwards}
+#disasterFX.cyclone .disaster-wash{background:repeating-conic-gradient(from 0deg at 50% 50%,#b9d6e988 0 10deg,#314c6a77 15deg 25deg);mask-image:radial-gradient(circle,transparent 0 13%,#000 48%);animation:spinStorm 3.4s ease-out forwards}
+#disasterFX.earthquake .disaster-wash,#disasterFX.landslide .disaster-wash{background:repeating-linear-gradient(135deg,#8a705b88 0 16px,#3d4a5288 17px 32px);animation:quakeShake .22s linear 12}
+.disaster-particles{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:clamp(45px,10vw,110px);letter-spacing:clamp(4px,2vw,22px);opacity:.85;text-shadow:0 5px 20px #001a2b88;animation:particleDrift 3.2s ease-out forwards}
+.disaster-banner{position:relative;max-width:min(88vw,560px);padding:20px 28px;border:2px solid #ffffffb8;border-radius:22px;background:#132d43ed;color:#fff;text-align:center;box-shadow:0 18px 70px #07182777;animation:disasterPop .5s cubic-bezier(.2,.9,.2,1.2)}
+.disaster-banner strong{display:block;font-size:clamp(23px,5vw,42px);letter-spacing:.05em;text-transform:uppercase}
+.disaster-banner span{display:block;margin-top:6px;font-size:clamp(12px,2vw,14px);line-height:1.4}
+#disasterFX.drought .disaster-banner{background:linear-gradient(135deg,#8d4d22,#c28a36)}
+#disasterFX.flood .disaster-banner{background:linear-gradient(135deg,#075985,#38a7c7)}
+#disasterFX.wildfire .disaster-banner{background:linear-gradient(135deg,#7f1d1d,#e66a25)}
+#disasterFX.earthquake .disaster-banner,#disasterFX.landslide .disaster-banner{background:linear-gradient(135deg,#39434b,#856b52)}
+#disasterFX.cyclone .disaster-banner{background:linear-gradient(135deg,#334155,#64748b)}
+#disasterFX.heatwave .disaster-banner{background:linear-gradient(135deg,#9a3412,#eab34b)}
+@keyframes washRise{0%{transform:translateY(110%)}75%,100%{transform:translateY(-5%)}}
+@keyframes fireRise{0%{transform:translateY(80%);opacity:0}30%,100%{transform:translateY(0);opacity:.85}}
+@keyframes heatPulse{0%,100%{opacity:.3}50%{opacity:.9}}
+@keyframes spinStorm{0%{transform:rotate(0) scale(.3);opacity:0}100%{transform:rotate(720deg) scale(1.4);opacity:.8}}
+@keyframes quakeShake{0%,100%{transform:translate(0,0)}25%{transform:translate(10px,-5px)}75%{transform:translate(-9px,4px)}}
+@keyframes disasterPop{from{opacity:0;transform:scale(.65) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes disasterFade{0%,82%{opacity:1}100%{opacity:0}}
+@keyframes particleDrift{0%{transform:scale(.8) translateY(35px);opacity:0}25%{opacity:.85}100%{transform:scale(1.2) translateY(-20px);opacity:0}}
+.hex.severity-minor:after,.hex.severity-severe:after,.hex.severity-fatal:after{content:"";position:absolute;inset:0;clip-path:inherit;pointer-events:none;z-index:1}
+.hex.severity-minor:after{background:#22a44777;box-shadow:inset 0 0 0 5px #168c3b}
+.hex.severity-severe:after{background:#f2c23088;box-shadow:inset 0 0 0 5px #d49a00}
+.hex.severity-fatal:after{background:#e3343488;box-shadow:inset 0 0 0 5px #bd2020}
+.hex.disaster-target{animation:hexTargetPulse .65s ease-in-out 4;z-index:9}
+@keyframes hexTargetPulse{50%{filter:brightness(1.5) drop-shadow(0 0 12px #fff)}}
+.disaster-legend{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:2600;background:#102a43ed;color:#fff;padding:8px 12px;border-radius:30px;font-size:11px;font-weight:850;white-space:nowrap;box-shadow:0 4px 18px #0004}
+@media(prefers-reduced-motion:reduce){#disasterFX.active,.disaster-wash,.disaster-particles,.hex.disaster-target{animation:none!important}}
+body.dark-mode{--navy:#e5edf4;--navy2:#c5d4e0;--paper:#101b27;--panel:#182635;--line:#304456;--muted:#a9bdcc;color:var(--navy);background:var(--paper)}
+body.dark-mode .panel{background:var(--panel);border-color:var(--line);color:var(--navy)}
+body.dark-mode .topbar{background:linear-gradient(115deg,#07121d,#142b3c)}
+body.dark-mode .setup-intro h3,body.dark-mode .hex .building{color:#e5edf4}
+body.dark-mode .formgrid>div,body.dark-mode .player-inputs>div{background:#203244;border-color:#3b5367}
+body.dark-mode input,body.dark-mode select,body.dark-mode textarea{background:#122131;color:#e8f1f7;border-color:#40596c}
+body.dark-mode .btn.secondary{background:#2b4052;color:#e8f1f7;box-shadow:0 3px 0 #172a3b}
+body.dark-mode .resource-tray{background:rgba(24,38,53,.97);border-color:#405568}
+body.dark-mode .resource-card{border-color:#26394a}
+body.dark-mode .log,body.dark-mode .selected-info,body.dark-mode .info-box{background:#203244;color:#dce8ef}
+body.dark-mode #boardWrap{background:radial-gradient(ellipse at center,#233b45,#142733)}
+body.dark-mode .hex .terrain,body.dark-mode .hex .owner{background:#10202dcc;color:#f0f6fa}
+
+body.dark-mode .muted,body.dark-mode .eyebrow,body.dark-mode .footer-note{color:#c0d0dc}
+body.dark-mode label,body.dark-mode .panel h3,body.dark-mode .selected-info,body.dark-mode .log,body.dark-mode .played-list{color:#e4edf4}
+body.dark-mode .disaster-face{background:linear-gradient(135deg,#392b2a,#493330);border-color:#9b655a;color:#ffe5dc}
+body.dark-mode .winner-banner{background:#493b20;border-color:#8b7138;color:#ffe6a6}
+body.dark-mode .pill{background:#30485b;color:#f0f6fa}
+body.dark-mode .hex .building{color:#122b3b}
+body.dark-mode .severity-key{display:flex;gap:8px;flex-wrap:wrap;font-size:10px;font-weight:800;margin-top:8px}
+
+.placement-panel{border:1px solid #d5a83d;background:linear-gradient(135deg,#fff9e9,#fff);box-shadow:0 5px 18px #8a6b2512}
+.placement-prompt{font-size:15px;line-height:1.5;margin:8px 0;color:var(--navy)}
+.hex.available-pick{outline:3px solid #ffffff;outline-offset:-7px;filter:drop-shadow(0 0 5px #fff) drop-shadow(0 4px 3px #19384a35)}
+body.dark-mode .placement-panel{background:linear-gradient(135deg,#263446,#1b2a39);border-color:#9b7a35}
+body.dark-mode .placement-prompt{color:#f2f6fa}
+
+.terrain-legend{justify-content:center;gap:7px;margin:14px auto 2px;max-width:780px}
+.legend-chip{font-size:9px;font-weight:800;background:#ffffffd9;border:1px solid #cddbd6;color:#274456;padding:6px 9px;border-radius:20px;box-shadow:0 2px 5px #18394a0c}
+body.dark-mode #boardWrap{background:radial-gradient(ellipse at center,#203b3a,#142a31);border-color:#36524e}
+body.dark-mode .legend-chip{background:#263c48;border-color:#405b68;color:#e7f0f5}
+.hex.available-pick{outline:2px solid #fff;outline-offset:-6px}
+
+.hex:after{content:"";position:absolute;inset:5px;clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);border:1px solid #ffffff90;pointer-events:none;z-index:1}
+.hex.owned:before{inset:4px}
+.hex .terrain,.hex .tile-icon,.hex .tile-bottom{position:relative;z-index:2}
+@media(max-width:700px){#boardWrap{padding-left:10px;padding-right:10px}}
+
+/* Final map tuning: separated hex tiles with readable labels */
+#boardWrap{overflow:auto;padding:24px 16px 28px}
+#board{
+ display:grid!important;
+ grid-template-columns:repeat(5,108px)!important;
+ grid-template-rows:repeat(5,89px)!important;
+ gap:0!important;
+ width:max-content!important;
+ margin:0 auto!important;
+ align-items:center!important;
+ justify-items:center!important
+}
+#board .hex{
+ width:98px!important;
+ height:113px!important;
+ min-height:0!important;
+ padding:7px 5px!important;
+ box-sizing:border-box!important;
+ border:2px solid #ffffff!important;
+ border-radius:0!important;
+ clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%)!important;
+ filter:drop-shadow(0 2px 2px #17364a30)!important;
+ overflow:visible!important;
+}
+#board .hex:nth-child(n+4):nth-child(-n+7),
+#board .hex:nth-child(n+13):nth-child(-n+16){transform:translateX(54px)!important}
+#board .hex:nth-child(n+4):nth-child(-n+7):hover,
+#board .hex:nth-child(n+13):nth-child(-n+16):hover{transform:translate(54px,-2px)!important}
+#board .hex:hover{z-index:8;filter:brightness(1.05) drop-shadow(0 4px 3px #17364a35)!important}
+#board .hex .terrain{
+ display:block!important;
+ max-width:100%!important;
+ white-space:normal!important;
+ overflow-wrap:normal!important;
+ font-size:9px!important;
+ line-height:1.16!important;
+ letter-spacing:.025em!important;
+ padding:3px 4px!important;
+ border-radius:8px!important;
+ text-align:center!important;
+}
+#board .hex .tile-icon{font-size:21px!important;line-height:1!important}
+#board .hex .tile-bottom{gap:2px!important}
+#board .hex .owner{
+ display:block!important;
+ max-width:100%!important;
+ white-space:normal!important;
+ overflow-wrap:anywhere!important;
+ font-size:9px!important;
+ line-height:1.15!important;
+ padding:2px 4px!important;
+ text-align:center!important;
+}
+#board .hex .building{font-size:7px!important;line-height:1.1!important;min-height:8px!important}
+#board .hex .mini{font-size:6px!important;line-height:1!important}
+#board .hex.owned:before{inset:2px!important;border-width:2px!important}
+@media(max-width:700px){
+ #board{grid-template-columns:repeat(5,97px)!important;grid-template-rows:repeat(5,80px)!important}
+ #board .hex{width:88px!important;height:101.61px!important;padding:6px 4px!important}
+ #board .hex:nth-child(n+4):nth-child(-n+7),
+ #board .hex:nth-child(n+13):nth-child(-n+16){transform:translateX(48.5px)!important}
+ #board .hex:nth-child(n+4):nth-child(-n+7):hover,
+ #board .hex:nth-child(n+13):nth-child(-n+16):hover{transform:translate(48.5px,-2px)!important}
+ #board .hex .terrain{font-size:8px!important}
+ #board .hex .tile-icon{font-size:18px!important}
+ #board .hex .owner{font-size:8px!important}
+ #board .hex .building{font-size:7px!important}
+}
+
+/* Champagne & crimson visual identity */
+:root{
+ --navy:#4b1725;--navy2:#702638;--blue:#8c3044;--cyan:#f2e4d2;
+ --paper:#f7f0e6;--panel:#fffaf2;--line:#e5d3c2;--muted:#806b67;
+ --gold:#d7b77b;--green:#7f594e;--shadow:0 12px 35px rgba(75,23,37,.10);
+}
+body{background:linear-gradient(145deg,#f8f1e7,#efe1d2);color:#4b1725}
+.topbar{background:linear-gradient(110deg,#4b1725,#842d43);color:#fff}
+.brand-mark{background:linear-gradient(145deg,#f4e5c9,#d8b77d);color:#5a1d2d}
+.panel{background:#fffaf3;border-color:#e5d3c2;box-shadow:0 8px 24px #5b23300c}
+.btn.primary,.btn:not(.secondary){background:linear-gradient(135deg,#842d43,#571b2c);color:#fff;box-shadow:0 3px 0 #3e1420}
+.btn.secondary{background:#ead9c7;color:#5a1d2d;box-shadow:0 3px 0 #d2bda9}
+.pill{background:#f0dfca;color:#652337;border:1px solid #e0c9b2}
+.hero{background:radial-gradient(circle at 90% 15%,#b66b70 0,transparent 30%),linear-gradient(125deg,#4b1725,#842d43)}
+.hero-kicker{color:#f0d9b8}
+.setup-shell{background:#fffaf3}
+input,select,textarea{border-color:#dfcbbb;background:#fffdf9;color:#4b1725}
+.resource-tray{background:rgba(255,250,243,.97);border-color:#e4cdbb}
+#boardWrap{background:radial-gradient(ellipse at center,#f8eee0 0%,#eee0cf 72%,#e6d3c3 100%);border-color:#dfc8b3}
+#board .hex{color:#4b1725}
+#board .hex .terrain,#board .hex .owner{background:#fff8ed;color:#5a1d2d;border:1px solid #e8d5c0}
+#board .hex .building{color:#5a2633}
+#board .hex.owned:before{border-color:var(--owner)}
+.terrain-legend .legend-chip,.legend-chip{background:#fff8ed;border-color:#e2cbb7;color:#5a2633}
+.placement-panel{background:linear-gradient(135deg,#fff7e8,#f4e5d5);border-color:#d7b77b}
+#disasterFX .disaster-banner{border-color:#f5e5d0}
+body.dark-mode{
+ --navy:#f3e6d8;--navy2:#e4cbbb;--paper:#21171b;--panel:#302127;
+ --line:#57404a;--muted:#d0b9b1;--blue:#c16a7a;--cyan:#4c3038;
+ background:#21171b;color:#f3e6d8
+}
+body.dark-mode .topbar{background:linear-gradient(110deg,#170d12,#4b1725)}
+body.dark-mode .panel,body.dark-mode .resource-tray{background:#302127;border-color:#63434e;color:#f3e6d8}
+body.dark-mode .btn.secondary{background:#51313c;color:#f8e9d9;box-shadow:0 3px 0 #28161d}
+body.dark-mode input,body.dark-mode select,body.dark-mode textarea{background:#24181e;color:#f7eade;border-color:#674653}
+body.dark-mode #boardWrap{background:radial-gradient(ellipse at center,#493039,#281b22);border-color:#63434e}
+body.dark-mode #board .hex .terrain,body.dark-mode #board .hex .owner{background:#2d1d25eF;color:#fff0df;border-color:#8b5966}
+body.dark-mode #board .hex .building{color:#fff0df}
+body.dark-mode .legend-chip{background:#39242d;border-color:#76505b;color:#f6e6d8}
+body.dark-mode .muted,body.dark-mode .eyebrow{color:#d0b9b1}
+
+
+/* Terrain-coded solid hexes with centered text only */
+#board .hex{
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+  align-items:center!important;
+  gap:5px!important;
+  text-align:center!important;
+  padding:9px 7px!important;
+  border:2px solid rgba(75,23,37,.22)!important;
+  color:#39202a!important;
+  filter:drop-shadow(0 2px 2px rgba(75,23,37,.18))!important;
+}
+#board .hex[data-terrain="Farmland"]{background:#c9d9a6!important}
+#board .hex[data-terrain="Forest"]{background:#83ad91!important}
+#board .hex[data-terrain="Mountains"]{background:#b8b3ae!important}
+#board .hex[data-terrain="River/Lake"]{background:#9fc9d5!important}
+#board .hex[data-terrain="Urban"]{background:#d5b5a4!important}
+#board .hex[data-terrain="Grassland"]{background:#dfd49a!important}
+#board .hex:hover{filter:brightness(1.06) drop-shadow(0 4px 4px rgba(75,23,37,.22))!important}
+#board .hex.selected{outline:3px solid #702638!important;outline-offset:-5px}
+#board .hex .tile-icon{display:none!important}
+#board .hex .terrain,
+#board .hex .owner{
+  display:block!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  color:#39202a!important;
+  padding:0!important;
+  margin:0!important;
+  max-width:100%!important;
+  white-space:normal!important;
+  text-align:center!important;
+  line-height:1.15!important;
+}
+#board .hex .terrain{font-size:10px!important;font-weight:950!important;letter-spacing:.035em!important}
+#board .hex .tile-bottom{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:3px!important;
+  width:100%!important;
+  text-align:center!important;
+}
+#board .hex .owner{font-size:9px!important;font-weight:800!important}
+#board .hex .building{color:#39202a!important;font-size:8px!important;font-weight:750!important}
+#board .hex .mini{color:#513c40!important;font-size:7px!important}
+body.dark-mode #board .hex{border-color:rgba(255,240,223,.4)!important}
+body.dark-mode #board .hex .terrain,
+body.dark-mode #board .hex .owner,
+body.dark-mode #board .hex .building,
+body.dark-mode #board .hex .mini{color:#2c2025!important}
+
+/* Uniform regular pointy-top hex geometry: all six sides equal */
+#board .hex{
+  width:98px!important;
+  height:113.16px!important;
+  aspect-ratio:0.8660254 / 1!important;
+  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%)!important;
+  border-radius:0!important;
+}
+@media(max-width:700px){
+  #board .hex{width:88px!important;height:101.61px!important}
+}
+
+
+/* Highlight territories belonging to the player whose turn is active */
+#board .hex.active-owned{
+  z-index:3!important;
+  filter:none!important;
+}
+#board .hex.active-owned:before{
+  inset:3px!important;
+  border:2px solid #8c3044!important;
+  opacity:1!important;
+}
+#board .hex.active-owned .owner{
+  font-weight:850!important;
+}
+
+
+/* Small hex number in a champagne circle at the lower point */
+#board .hex{position:relative!important}
+#board .hex .hex-number{
+  position:absolute!important;
+  left:50%!important;
+  bottom:12px!important;
+  transform:translateX(-50%)!important;
+  width:17px!important;
+  height:17px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  border-radius:50%!important;
+  background:#ead7bd!important;
+  border:1px solid #c9aa85!important;
+  color:#572333!important;
+  font-size:9px!important;
+  font-weight:800!important;
+  line-height:1!important;
+  z-index:5!important;
+  pointer-events:none!important;
+}
+@media(max-width:700px){
+  #board .hex .hex-number{width:15px!important;height:15px!important;font-size:8px!important;bottom:10px!important}
+}
+
+
+/* Building construction feedback and compact map building pictograms */
+#board .hex .building-line{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:1px!important;
+  width:100%!important;
+}
+#board .hex .building-mark{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:17px!important;
+  height:17px!important;
+  color:#572333!important;
+  opacity:.9!important;
+}
+#board .hex .building-mark svg{
+  display:block!important;
+  width:16px!important;
+  height:16px!important;
+  fill:none!important;
+  stroke:currentColor!important;
+  stroke-width:1.8!important;
+  stroke-linecap:round!important;
+  stroke-linejoin:round!important;
+}
+#board .hex .building{font-weight:800!important}
+#buildActions .action-card button{pointer-events:auto!important;position:relative!important;z-index:2!important}
+
+
+/* Plague and locust swarm disaster visuals */
+#disasterFX.plague .disaster-wash{
+ background:
+  radial-gradient(circle at 18% 25%,#8cf0a055 0 3%,transparent 9%),
+  radial-gradient(circle at 75% 68%,#5ad58a55 0 4%,transparent 12%),
+  repeating-linear-gradient(115deg,#183e3555 0 3px,transparent 3px 18px),
+  linear-gradient(135deg,#0a261f99,#1d573e88,#071d1b99);
+ animation:plagueCorrode 3.5s ease-in-out forwards;
+}
+#disasterFX.plague .disaster-particles{
+ font-size:clamp(32px,7vw,76px);
+ letter-spacing:8px;
+ animation:virusDrift 3.3s ease-in-out forwards;
+}
+#disasterFX.plague .disaster-banner{background:linear-gradient(135deg,#173d31,#397b50)}
+#disasterFX.locust-swarm .disaster-wash{
+ background:
+  linear-gradient(180deg,#8a754144,transparent 72%),
+  radial-gradient(ellipse at 50% 60%,#4c542e55,transparent 65%);
+ animation:locustDust 3.4s ease-out forwards;
+}
+#disasterFX.locust-swarm .disaster-particles{
+ font-size:clamp(30px,6vw,68px);
+ letter-spacing:3px;
+ white-space:normal;
+ line-height:1.7;
+ animation:locustFly 3.5s ease-in-out forwards;
+}
+#disasterFX.locust-swarm .disaster-banner{background:linear-gradient(135deg,#57502b,#88733a)}
+@keyframes plagueCorrode{
+ 0%{transform:translateY(110%) scale(.8);opacity:.15;filter:blur(8px)}
+ 35%{transform:translateY(0) scale(1);opacity:.9;filter:blur(1px)}
+ 65%{opacity:.8;filter:blur(2px) saturate(1.7)}
+ 100%{transform:translateY(-8%) scale(1.08);opacity:0;filter:blur(10px)}
+}
+@keyframes virusDrift{
+ 0%{transform:scale(.55) rotate(-12deg);opacity:0}
+ 25%{opacity:.95}
+ 70%{transform:scale(1.15) rotate(10deg);opacity:.9}
+ 100%{transform:scale(1.45) rotate(20deg);opacity:0}
+}
+@keyframes locustFly{
+ 0%{transform:translate(-65vw,-18vh) rotate(-12deg);opacity:0}
+ 15%{opacity:.95}
+ 50%{transform:translate(0,8vh) rotate(8deg);opacity:1}
+ 100%{transform:translate(70vw,-12vh) rotate(-10deg);opacity:0}
+}
+@keyframes locustDust{
+ 0%{transform:translateY(90%);opacity:0}
+ 35%{transform:translateY(0);opacity:.7}
+ 100%{transform:translateY(-12%);opacity:0}
+}
+
+</style>
+</head>
+<body>
+<header class="topbar">
+ <div class="brand"><div class="brand-mark">TN</div><div><h1>TERRA NOVA</h1><p>THE SDG RACE · LOCAL MULTIPLAYER</p></div></div>
+ <div class="top-actions"><span class="pill" style="background:#ffffff20;color:#fff" id="topRound">GAME SETUP</span><button class="btn secondary small" id="themeToggle" type="button" aria-pressed="false">Dark mode</button><button class="btn secondary small" onclick="openDeveloperLock()">Developer panel</button><button class="btn secondary small" onclick="showRules()">Quick rules</button><button class="btn secondary small" onclick="newGame()">New game</button></div>
+</header>
+
+<section id="setup" class="panel setup-shell">
+ <div class="hero"><div class="hero-kicker">A strategy game for a sustainable future</div><h2>Build a better world.<br>Race to lead it.</h2><p>Gather resources, develop thriving communities, protect your territory and reach all five Sustainable Development Goals before your rivals.</p><div class="hero-tags"><span>3–6 players</span><span>45–60 minutes</span><span>Pass &amp; play</span></div></div>
+ <div class="setup-intro"><div><div class="eyebrow">Before you begin</div><h3>Set up your world</h3><p>Choose your game settings and enter each player's name. The board and starting settlements are prepared automatically.</p></div><div class="setup-mark">TN<span>19 HEXES</span></div></div>
+ <div class="formgrid">
+  <div><label for="playerCount">Players</label><select id="playerCount"><option value="3">3 players</option><option value="4">4 players</option><option value="5">5 players</option><option value="6">6 players</option></select></div>
+  <div><label for="grassChoice">Grassland production</label><select id="grassChoice"><option value="Medicine">Medicine</option></select></div>
+  <div><label for="difficulty">Disaster frequency</label><select id="difficulty"><option value="standard">Standard</option><option value="gentle">Gentle (milder disasters)</option></select></div>
+  <div><label for="starting">Starting setup</label><select id="starting"><option value="guided">Automatic fair setup</option><option value="quick">Quick start (random placements)</option></select></div>
+ </div>
+ <div id="nameInputs" class="player-inputs"></div>
+ <div class="row" style="justify-content:space-between;margin-top:16px"><span class="muted">Each player starts with 2 settlements and starting resources.</span><button type="button" class="btn gold" id="startGameBtn">Start new game →</button></div><p id="setupError" role="alert" style="color:#a94444;font-weight:750;min-height:20px"></p>
+</section>
+
+<main id="game">
+<div class="leftcol">
+<section class="panel">
+   <div class="panel-head"><div><div class="eyebrow">The continent</div><h2>19-hex territory map</h2></div><div class="statusline"><span class="pill" id="roundPill">Round 1</span><span class="pill turn-pill" id="turnPill">Player 1's turn</span></div></div>
+   <div id="winnerBanner" class="winner-banner"></div>
+   <div id="boardWrap"><div id="board"></div></div>
+   <div class="terrain-legend"><span class="legend-chip">🌾 Farmland · Food</span><span class="legend-chip">🌲 Forest · Timber</span><span class="legend-chip">⛰ Mountains · Minerals</span><span class="legend-chip">💧 River/Lake · Water</span><span class="legend-chip">🏙 Urban · Money</span><span class="legend-chip">🌿 Grassland · Medicine</span></div>
+   <div class="panel-head" style="margin-top:14px;margin-bottom:4px"><div><div class="eyebrow">Dice & production</div><div class="dicebox"><div class="die" id="dieA">—</div><div class="die" id="dieB">—</div><strong id="rollText">Roll to begin your turn</strong></div></div><button class="btn gold" id="rollBtn" onclick="rollDice()">Roll dice</button></div>
+   <div class="muted">A matching dice roll activates owned hexes and produces resources. Rolling 7 triggers a disaster.</div>
+  </section>
+
+  <section class="panel">
+   <div class="panel-head"><div><div class="eyebrow">Territory & construction</div><h2>Action centre</h2></div><span class="pill" id="actionCount">0/2 builds · 0/1 territory</span></div>
+   <div id="selectedInfo" class="selected-info">Select a hex on the map to inspect it and choose an action.</div>
+   <h3>Build on your selected territory</h3>
+   <div class="actiongrid" id="buildActions"></div>
+   <h3>Food → Zero Hunger</h3>
+   <div class="row"><button class="btn green" id="foodToSDG2Btn" onclick="convertFoodToSDG2()">Convert 3 Food → +1 SDG 2</button><span class="muted" id="foodConvertStatus">Once per turn, after rolling.</span></div>
+   <h3>Expand your territory</h3>
+   <div class="row"><button class="btn green" id="claimBtn" onclick="claimTerritory()">Claim empty hex · 1 Money + 1 Timber</button><button class="btn red" id="challengeBtn" onclick="challengeTerritory()">Challenge opponent · spin wheel</button></div>
+   <p class="footer-note">One territory action per turn. Challenge adjacent opponent-owned empty hexes by spinning the wheel: CONQUERED takes the land; FAILED costs 2 Minerals + 2 Money.</p>
+  </section>
+
+  <section class="panel">
+   <div class="panel-head"><div><div class="eyebrow">Player economy</div><h2>Trade resources</h2></div></div>
+   <h3>Trade with another player</h3>
+   <div class="formgrid">
+    <div><label for="tradePlayer">Trade with</label><select id="tradePlayer"></select></div>
+    <div><label for="offerResource">You offer</label><select id="offerResource"></select></div>
+    <div><label for="offerQty">Quantity offered</label><input id="offerQty" type="number" min="1" value="1"></div>
+    <div><label for="wantResource">You request</label><select id="wantResource"></select></div>
+    <div><label for="wantQty">Quantity requested</label><input id="wantQty" type="number" min="1" value="1"></div>
+   </div>
+   <div class="row" style="margin-top:10px"><button class="btn secondary" onclick="playerTrade()">Propose & resolve trade</button><span class="muted">Both players must agree.</span></div>
+  </section>
+ </div>
+
+ <aside class="rightcol">
+  <section class="panel">
+   <div class="panel-head"><div><div class="eyebrow">Active player</div><h2 id="activeName">Player 1</h2></div><span class="pill" id="activeColor">BLUE</span></div>
+   
+   <div class="row" style="margin-top:12px;justify-content:space-between"><button class="btn small" onclick="endTurn()" id="endTurnBtn">End turn →</button></div>
+  </section>
+  <section class="panel">
+   <div class="panel-head"><div><div class="eyebrow">Victory progress</div><h2>SDG scoreboards</h2></div></div>
+   <div id="players"></div>
+   <p class="footer-note">First player to reach 10 in every track wins. Each player scores individually.</p>
+  </section>
+  <section class="panel">
+   <div class="panel-head"><div><div class="eyebrow">Card table</div><h2>Development & disaster cards</h2></div><span class="pill" id="deckCount">12 development</span></div>
+   <div class="row"><button class="btn secondary" onclick="buyDevelopment()">Buy development card · 1 Food + 1 Mineral + 1 Money</button><button class="btn small" onclick="playDevelopment()">Play a card</button></div>
+   <div class="card-decks">
+    <div class="deck-tile"><div class="deck-back development-back">TN<br><small>DEVELOPMENT</small></div><div><b>Development deck</b><div class="muted" id="developmentCount">12 cards remaining</div></div></div>
+    <div class="deck-tile"><div class="deck-back disaster-back">!</div><div><b>Disaster deck</b><div class="muted" id="disasterCount">12 cards remaining</div></div></div>
+   </div>
+   <h3>Your hand</h3><div id="handCards" class="hand-grid"></div>
+   <h3>Last disaster card</h3><div id="lastDisasterCard" class="disaster-face muted">No disaster drawn yet.</div>
+   <h3>Played cards</h3><div id="playedCards" class="played-list muted">No cards played yet.</div>
+  </section>
+  <section class="panel">
+   <div class="panel-head"><div><div class="eyebrow">Game record</div><h2>Event log</h2></div><button class="btn secondary small" onclick="clearLog()">Clear</button></div>
+   <div class="log" id="log"></div>
+  </section>
+ </aside>
+ 
+  <section class="panel resource-tray">
+   <div class="panel-head"><div><div class="eyebrow">Your hand</div><h2>Resource cards</h2></div><div class="row" style="gap:8px"><span class="pill" id="handCount">0 resource cards</span><button type="button" class="btn secondary" id="minimizeHand" aria-expanded="true">Minimize −</button></div></div>
+   <div class="resource-grid resource-cards" id="resources"></div>
+  </section>
+</main>
+
+<div class="overlay" id="overlay" role="dialog" aria-modal="true"><div class="dialog"><div id="dialogBody"></div><div class="dialog-actions" id="dialogActions"></div></div></div>
+<div id="toast"></div><div id="disasterFX" aria-hidden="true"></div>
+
+<script>
+"use strict";
+const RESOURCE_META={
+ Food:{icon:"🌾",terrain:"Farmland"},Water:{icon:"💧",terrain:"River/Lake"},
+ Timber:{icon:"🪵",terrain:"Forest"},Minerals:{icon:"⛰",terrain:"Mountains"},
+ Money:{icon:"🪙",terrain:"Urban"},Medicine:{icon:"✚",terrain:""}
+};
+const RESOURCES=Object.keys(RESOURCE_META);
+const COLORS=["#2878a5","#c6534b","#318267","#8c62ae","#ce8b2e","#536b7a"];
+const TERRAIN=[
+ "Forest","Farmland","Urban",
+ "Mountains","Grassland","River/Lake","Forest",
+ "Farmland","Mountains","Grassland","Urban","River/Lake",
+ "Forest","Farmland","Grassland","Mountains",
+ "River/Lake","Urban","Farmland"
+];
+const COST={
+ Settlement:{Food:1,Timber:2,Money:1},
+ Farm:{Water:1,Timber:1,Money:1},
+ Hospital:{Water:1,Timber:1,Minerals:2,Money:1,Medicine:1},
+ "Water Treatment Plant":{Timber:2,Minerals:1,Money:1},
+ City:{Food:1,Timber:2,Minerals:2,Money:2}
+};
+const SDG_INDEX={Settlement:0,Farm:1,Hospital:2,"Water Treatment Plant":3};
+const SDG_NAMES=["SDG 1 · No Poverty","SDG 2 · Zero Hunger","SDG 3 · Good Health","SDG 6 · Clean Water"];
+const BUILD_TERRAINS={
+ Settlement:TERRAIN,
+ Farm:["Farmland","Grassland"],
+ Hospital:["Urban","Grassland"],
+ "Water Treatment Plant":["River/Lake","Urban"],
+ City:[]
+};
+const DEVELOPMENT=[
+ {name:"Affordable Housing",desc:"Gain +1 SDG 1 and 1 Money.",effect:p=>{score(p,0,1);p.res.Money++}},
+ {name:"Community Employment",desc:"Gain +1 SDG 1 and 1 Mineral.",effect:p=>{score(p,0,1);p.res.Minerals++}},
+ {name:"Agricultural Innovation",desc:"Gain +1 SDG 2 and 1 Food.",effect:p=>{score(p,1,1);p.res.Food++}},
+ {name:"Food Distribution",desc:"Gain +1 SDG 2 and 1 Food.",effect:p=>{score(p,1,1);p.res.Food++}},
+ {name:"Medical Breakthrough",desc:"Gain +1 SDG 3 and 1 Medicine.",effect:p=>{score(p,2,1);p.res.Medicine++}},
+ {name:"Preventive Medicine",desc:"Gain +1 SDG 3 and one Minor disaster shield.",effect:p=>{score(p,2,1);p.shields++}},
+ {name:"Clean Water Technology",desc:"Gain +1 SDG 6 and 1 Water.",effect:p=>{score(p,3,1);p.res.Water++}},
+ {name:"Watershed Restoration",desc:"Gain +1 SDG 6 and gain one disaster shield.",effect:p=>{score(p,3,1);p.shields++}},
+ {name:"Trade Agreement",desc:"Gain 2 Money.",effect:p=>{p.res.Money+=2}},
+ {name:"Disaster Insurance",desc:"Gain one disaster shield.",effect:p=>{p.shields++}},
+ {name:"Skilled Workforce",desc:"Gain 1 Timber and 1 Mineral.",effect:p=>{p.res.Timber++;p.res.Minerals++}},
+ {name:"Community Cooperative",desc:"Gain 1 Food, 1 Water or 1 Money.",effect:p=>{p.res.Food++;p.res.Water++;p.res.Money++}}
+];
+let state=null,selectedHex=null,toastTimer=null;
+const $=id=>document.getElementById(id);
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function clone(o){return JSON.parse(JSON.stringify(o));}
+function rand(n){return Math.floor(Math.random()*n);}
+function shuffle(a){for(let i=a.length-1;i>0;i--){let j=rand(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;}
+function current(){return state.players[state.turn];}
+function toast(msg){const el=$("toast");el.textContent=msg;el.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove("show"),2600);}
+function addLog(msg){state.log.unshift({round:state.round,turn:state.turn,msg});state.log=state.log.slice(0,70);renderLog();}
+function score(p,index,n){p.sdg[index]=Math.min(10,p.sdg[index]+n);}
+function canPay(p,cost){return Object.entries(cost).every(([r,n])=>p.res[r]>=n);}
+function pay(p,cost){Object.entries(cost).forEach(([r,n])=>p.res[r]-=n);}
+function costText(c){return Object.entries(c).map(([r,n])=>`${n} ${r}`).join(" · ");}
+function totalResources(p){return RESOURCES.reduce((s,r)=>s+p.res[r],0);}
+function createNameInputs(){
+ const n=+$("playerCount").value,wrap=$("nameInputs");wrap.innerHTML="";
+ for(let i=0;i<n;i++){let d=document.createElement("div");d.innerHTML=`<label for="pname${i}">Player ${i+1} name</label><input id="pname${i}" maxlength="16" value="Player ${i+1}" autocomplete="off">`;wrap.appendChild(d);}
+}
+$("playerCount").addEventListener("change",createNameInputs);
+function setTheme(dark){
+ document.body.classList.toggle("dark-mode",dark);
+ const b=$("themeToggle");b.textContent=dark?"Light mode":"Dark mode";b.setAttribute("aria-pressed",String(dark));
+ try{localStorage.setItem("terraNovaTheme",dark?"dark":"light");}catch(e){}
+}
+$("themeToggle").addEventListener("click",()=>setTheme(!document.body.classList.contains("dark-mode")));
+try{setTheme(localStorage.getItem("terraNovaTheme")==="dark");}catch(e){setTheme(false);}
+
+$("startGameBtn").addEventListener("click",()=>{try{$("setupError").textContent="";startGame();}catch(err){console.error(err);$("setupError").textContent="Could not start game: "+err.message;toast("Setup error: "+err.message);}});
+
+$("minimizeHand").addEventListener("click",()=>{
+ const tray=document.querySelector(".resource-tray"),collapsed=!tray.classList.contains("minimized");
+ tray.classList.toggle("minimized",collapsed);
+ document.body.classList.toggle("hand-minimized",collapsed);
+ $("minimizeHand").textContent=collapsed?"Show cards +":"Minimize −";
+ $("minimizeHand").setAttribute("aria-expanded",String(!collapsed));
+});
+window.addEventListener("error",e=>{console.error(e.error||e.message);if($("setup").style.display!=="none")$("setupError").textContent="Game error: "+(e.message||"Unknown error");});
+createNameInputs();
+function makeCoords(){
+ const rows=[3,4,5,4,3],coords=[];let id=0;
+ rows.forEach((n,r)=>{for(let c=0;c<n;c++)coords.push({id,r,c:c-(n-1)/2});});
+ return coords;
+}
+const COORDS=makeCoords();
+function adjacent(a,b){
+ const A=COORDS[a],B=COORDS[b];if(!A||!B)return false;
+ const aq=A.c-(A.r-2)/2, ar=A.r, bq=B.c-(B.r-2)/2, br=B.r;
+ const dq=aq-bq,dr=ar-br;return Math.max(Math.abs(dq),Math.abs(dr),Math.abs(dq+dr))===1;
+}
+
+function startGame(){
+ const n=+$("playerCount").value,grass=$("grassChoice").value;
+ const names=Array.from({length:n},(_,i)=>($("pname"+i).value.trim()||"Player "+(i+1)));
+ const numberBag=shuffle([2,3,3,4,4,4,5,5,5,6,6,6,8,8,8,9,9,10,11]);
+ const tiles=TERRAIN.map((terrain,i)=>({id:i,terrain,number:numberBag[i],owner:null,building:null,exhausted:0,ruined:false,shield:false}));
+ const players=names.map((name,i)=>({name,color:COLORS[i],eliminated:false,res:{Food:2,Water:2,Timber:2,Minerals:1,Money:2,Medicine:1},sdg:[2,2,2,2],territory:0,hand:[],shields:0}));
+ state={players,tiles,turn:0,round:1,grass,difficulty:$("difficulty").value,rolled:false,builds:0,territoryUsed:false,log:[],deck:shuffle(clone(DEVELOPMENT)),disasterDeck:shuffle(["Drought","Flood","Wildfire","Earthquake","Cyclone","Heatwave","Landslide","Plague","Locust Swarm","Drought","Flood","Wildfire","Cyclone","Heatwave","Plague"]),lastDisaster:null,playedCards:[],winner:null,tradeUsed:false,foodConverted:false,placementMode:false};
+ // Randomised snake allocation: every player receives two distinct starting plots.
+ const order=shuffle([...Array(n).keys(),...[...Array(n).keys()]]);
+ for(const pi of order){
+  const free=tiles.filter(t=>t.owner===null&&!t.ruined);
+  if(!free.length)break;
+  const spaced=free.filter(t=>!tiles.some(x=>x.building==="Settlement"&&adjacent(x.id,t.id)));
+  const pool=spaced.length?spaced:free;
+  const chosen=pool[rand(pool.length)];
+  chosen.owner=pi;chosen.building="Settlement";
+  players[pi].territory++;
+ }
+ $("setup").style.display="none";$("game").style.display="grid";
+ selectedHex=null;
+ $("placementPanel")?.style && ($("placementPanel").style.display="none");
+ addLog("Game created. Each player's two starting Settlement plots were assigned randomly.");
+ render();toast("Game ready. "+current().name+" starts.");
+}
+function newGame(){if(state&&!state.winner&&!confirm("Start a new game? The current game will be lost."))return;state=null;selectedHex=null;$("game").style.display="none";$("setup").style.display="block";$("topRound").textContent="GAME SETUP";}
+function render(){
+ if(!state)return;
+ $("topRound").textContent=`ROUND ${state.round} · ${state.turn+1}/${state.players.length}`;
+ $("roundPill").textContent="Round "+state.round;
+ $("turnPill").textContent=current().name+"'s turn";
+ $("activeName").textContent=current().name;
+ $("activeColor").textContent="PLAYER "+(state.turn+1);
+ $("activeColor").style.background=current().color;$("activeColor").style.color="#fff";
+ $("resources").innerHTML=RESOURCES.map((r,i)=>`<div class="resource-card resource-${r.toLowerCase()}" style="--card-index:${i}"><span class="card-corner">${current().res[r]}</span><div class="resource-symbol">${RESOURCE_META[r].icon}</div><div class="resource-amount">${current().res[r]}</div><div class="resource-label">${r}</div><span class="card-corner bottom">${current().res[r]}</span></div>`).join("");
+ $("handCount").textContent=totalResources(current())+" resource cards · "+current().shields+" shield(s)";
+ $("actionCount").textContent=`${state.builds}/2 builds · ${state.territoryUsed?1:0}/1 territory`;
+ const foodBtn=$("foodToSDG2Btn");
+ if(foodBtn){
+  foodBtn.disabled=!state.rolled||state.foodConverted||current().res.Food<3||!!state.winner;
+  $("foodConvertStatus").textContent=state.foodConverted?"Already used this turn.":"Costs 3 Food · once per turn after rolling.";
+ }
+ $("rollBtn").disabled=state.placementMode||state.rolled||!!state.winner;
+ $("endTurnBtn").disabled=state.placementMode||!state.rolled||!!state.winner;
+ $("claimBtn").disabled=state.placementMode||!state.rolled||state.territoryUsed||!!state.winner;
+ $("challengeBtn").disabled=state.placementMode||!state.rolled||state.territoryUsed||!!state.winner;
+ $("winnerBanner").style.display=state.winner?"block":"none";
+ if(state.winner)$("winnerBanner").textContent="🏆 "+state.winner.name+" wins! All four SDG tracks reached 10.";
+ renderBoard();renderPlayers();renderSelected();renderBuildActions();renderCards();renderTradeSelects();renderLog();
+}
+function renderBoard(){
+ $("board").innerHTML=state.tiles.map(t=>{
+  const owner=t.owner===null?null:state.players[t.owner];
+  const canPick=state.placementMode&&t.owner===null&&!state.tiles.some(x=>x.building==="Settlement"&&adjacent(x.id,t.id));
+  const cls=[selectedHex===t.id?"selected":"",owner?"owned":"",owner&&t.owner===state.turn?"active-owned":"",canPick?"available-pick":""].join(" ");
+  let building=t.building||"No building";
+  const buildingMarks={
+   Settlement:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11 12 4l9 7v9H3z M9 20v-6h6v6" /></svg>',
+   Farm:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21V8 M12 13C5 13 5 7 5 7s7-1 7 6 M12 11c0-6 7-7 7-7s1 7-7 7" /></svg>',
+   Hospital:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21V5h16v16 M9 21v-5h6v5 M12 8v6 M9 11h6" /></svg>',
+   "Water Treatment Plant":'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20h14 M7 20V9h10v11 M9 9V5h6v4 M12 12c-2 2-2 4 0 5 2-1 2-3 0-5Z" /></svg>',
+   City:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21V9h7v12 M10 21V4h11v17 M6 12h1 M6 16h1 M14 8h2 M18 8h1 M14 12h2 M18 12h1 M14 16h2 M18 16h1" /></svg>'
+  };
+  const buildingMark=t.building?`<span class="building-mark">${buildingMarks[t.building]||""}</span>`:"";
+  return `<button class="hex ${cls} ${t.ruined?"ruined":""} ${t.exhausted>0?"exhausted":""}" data-terrain="${t.terrain}" style="${owner?"--owner:"+owner.color:""}" onclick="selectHex(${t.id})" aria-label="Hex ${t.id+1}, ${t.terrain}, ${owner?owner.name:'unowned'}">
+   <span class="terrain">${esc(t.terrain)}</span>
+   <span class="tile-bottom"><span class="owner">${owner?esc(owner.name):"Unclaimed"}</span><span class="building-line">${buildingMark}<span class="building">${t.building?esc(t.building):"Empty plot"}</span></span><span class="mini">${t.ruined?"Ruined":t.exhausted>0?`Inactive · ${t.exhausted}`:t.shield?"Protected":""}</span></span>
+   <span class="hex-number">${t.number}</span>
+  </button>`;
+ }).join("");
+}
+function renderPlayers(){
+ $("players").innerHTML=state.players.map((p,i)=>`<div class="player-card ${i===state.turn?"active":""} ${p.eliminated?"eliminated":""}" style="--pc:${p.color}">
+  <div class="player-head"><span>${esc(p.name)} ${p.eliminated?"· ELIMINATED":i===state.turn?"· PLAYING":""}</span><span>${p.territory} hexes</span></div>
+  ${p.sdg.map((v,j)=>`<div class="track"><span>SDG ${[1,2,3,6][j]}</span><div class="bar"><i style="width:${v*10}%"></i></div><b>${v}/10</b></div>`).join("")}
+ </div>`).join("");
+}
+function renderSelected(){
+ const el=$("selectedInfo");
+ if(selectedHex===null){el.textContent="Select a hex on the map to inspect it and choose an action.";return;}
+ const t=state.tiles[selectedHex],owner=t.owner===null?"Unclaimed":state.players[t.owner].name;
+ const production=t.terrain==="Grassland"?"Medicine":({Farmland:"Food",Forest:"Timber",Mountains:"Minerals","River/Lake":"Water",Urban:"Medicine"})[t.terrain];
+ el.innerHTML=`<b>Hex ${t.id+1} · ${esc(t.terrain)}</b> &nbsp; <span class="muted">Roll ${t.number}</span><br>Owner: <b>${esc(owner)}</b> · Building: <b>${esc(t.building||"None")}</b><br>Produces: ${production} · Status: ${t.ruined?"Ruined":t.exhausted?`Inactive for ${t.exhausted} round(s)`:"Active"}`;
+}
+function renderBuildActions(){
+ const p=current();
+ $("buildActions").innerHTML=Object.entries(COST).map(([name,cost])=>{
+  const allowed=canPay(p,cost),ready=allowed&&state.rolled&&state.builds<2&&!state.winner;
+  return `<div class="action-card"><strong>${esc(name)}</strong><span>${costText(cost)}${SDG_INDEX[name]!==undefined?" · +1 SDG "+[1,2,3,6][SDG_INDEX[name]]:name==="City"?" · No SDG point":""}</span><button type="button" class="btn small ${ready?"":"secondary"}" onclick="build('${name.replace(/'/g,"\\'")}')">Build</button></div>`;
+ }).join("");
+}
+function renderCards(){
+ const p=current();
+ $("deckCount").textContent=state.deck.length+" development";
+ $("developmentCount").textContent=state.deck.length+" cards remaining";
+ $("disasterCount").textContent=state.disasterDeck.length+" cards remaining";
+ $("handCards").innerHTML=p.hand.length?p.hand.map((c,i)=>`<div class="game-card"><div><span class="card-type">Development</span><b>${esc(c.name)}</b><p>${esc(c.desc)}</p></div><button class="btn small secondary" onclick="playCard(${i})">Play card</button></div>`).join(""):"<span class='muted'>Your hand is empty. Buy a development card to draw one.</span>";
+ const d=state.lastDisaster;
+ $("lastDisasterCard").className=d?"disaster-face":"disaster-face muted";
+ $("lastDisasterCard").innerHTML=d?`<b>⚠ ${esc(d.name)}</b><p>${esc(d.description)}</p><p style="margin-top:6px"><strong>Affected area:</strong> ${esc(d.target)}</p><p class="severity-key"><span>🟢 Minor</span><span>🟡 Severe</span><span>🔴 Fatal</span></p>`:"No disaster drawn yet.";
+ $("playedCards").innerHTML=state.playedCards.length?state.playedCards.slice(-8).reverse().map(c=>`<div>✓ ${esc(c.player)} — ${esc(c.name)}</div>`).join(""):"No cards played yet.";
+}
+function renderTradeSelects(){
+ const opts=RESOURCES.map(r=>`<option>${r}</option>`).join("");
+ ["offerResource","wantResource"].forEach(id=>{let el=$(id),v=el.value;el.innerHTML=opts;if(RESOURCES.includes(v))el.value=v;});
+ $("tradePlayer").innerHTML=state.players.map((p,i)=>({p,i})).filter(x=>x.i!==state.turn).map(x=>`<option value="${x.i}">${esc(x.p.name)}</option>`).join("");
+}
+function renderLog(){$("log").innerHTML=state.log.slice(0,30).map(x=>`<div><span class="muted">R${x.round}</span> · ${esc(x.msg)}</div>`).join("")||"<span class='muted'>No events yet.</span>";}
+function selectHex(id){
+ if(!state)return;
+ if(state.placementMode){
+  const t=state.tiles[id];
+  const pi=state.placementOrder[state.placementStep];
+  if(!t||t.owner!==null||t.ruined)return toast("That plot is already taken. Choose an unclaimed hex.");
+  if(state.tiles.some(x=>x.building==="Settlement"&&adjacent(x.id,id)))return toast("Starting Settlements cannot be adjacent. Choose a different hex.");
+  t.owner=pi;t.building="Settlement";
+  const player=state.players[pi];player.territory++;score(player,0,1);
+  selectedHex=id;state.placementStep++;
+  if(state.placementStep>=state.placementOrder.length){
+   state.placementMode=false;
+   $("placementPanel").style.display="none";
+   state.turn=0;
+   addLog("Starting placements complete. Every player begins with two Settlements and +2 SDG 1.");
+   toast("Starting plots selected. "+current().name+" begins!");
+  }else{
+   const next=state.players[state.placementOrder[state.placementStep]];
+   addLog(`${player.name} placed a starting Settlement on hex ${id+1}.`);
+   toast(next.name+" chooses next.");
+  }
+  render();updatePlacementUI();return;
+ }
+ selectedHex=id;renderBoard();renderSelected();
+}
+function rollDice(){
+ if(!state||state.rolled||state.winner)return;
+ state.rolled=true;const a=rand(6)+1,b=rand(6)+1,total=a+b;
+ $("dieA").textContent=a;$("dieB").textContent=b;$("rollText").textContent="Total: "+total;
+ if(total===7)resolveDisaster();else resolveProduction(total);
+ render();checkVictory();
+}
+function resolveProduction(total){
+ let summary=[];
+ state.tiles.forEach(t=>{
+  if(t.number!==total||t.owner===null||t.ruined||t.exhausted>0)return;
+  const p=state.players[t.owner];
+  const resource=t.terrain==="Grassland"?"Medicine":({Farmland:"Food",Forest:"Timber",Mountains:"Minerals","River/Lake":"Water",Urban:"Medicine"})[t.terrain];
+  let amount=t.building==="City"?2:t.building==="Settlement"?1:0;
+  if(t.building==="Farm")amount+=1;
+  if(t.building==="Water Treatment Plant")amount+=1;
+  if(amount){p.res[resource]+=amount;summary.push(`${p.name} +${amount} ${resource}`);}
+ });
+ addLog(summary.length?`Roll ${total}: ${summary.join("; ")}.`:`Roll ${total}: no owned active hex produced resources.`);
+}
+const HAZARDS={
+ Drought:{"Farmland":"Severe","Forest":"Minor","Mountains":"Immune","River/Lake":"Severe","Urban":"Severe","Grassland":"Severe"},
+ Flood:{"Farmland":"Severe","Forest":"Severe","Mountains":"Severe","River/Lake":"Immune","Urban":"Severe","Grassland":"Severe"},
+ Wildfire:{"Farmland":"Severe","Forest":"Fatal","Mountains":"Immune","River/Lake":"Immune","Urban":"Severe","Grassland":"Severe"},
+ Earthquake:{"Farmland":"Minor","Forest":"Minor","Mountains":"Fatal","River/Lake":"Severe","Urban":"Fatal","Grassland":"Minor"},
+ Cyclone:{"Farmland":"Severe","Forest":"Severe","Mountains":"Severe","River/Lake":"Severe","Urban":"Fatal","Grassland":"Severe"},
+ Heatwave:{"Farmland":"Severe","Forest":"Minor","Mountains":"Minor","River/Lake":"Minor","Urban":"Severe","Grassland":"Severe"},
+ Landslide:{"Farmland":"Minor","Forest":"Severe","Mountains":"Fatal","River/Lake":"Severe","Urban":"Minor","Grassland":"Minor"},
+ Plague:{"Farmland":"Minor","Forest":"Minor","Mountains":"Minor","River/Lake":"Minor","Urban":"Minor","Grassland":"Minor"},
+ "Locust Swarm":{"Farmland":"Severe","Forest":"Minor","Mountains":"Immune","River/Lake":"Immune","Urban":"Minor","Grassland":"Severe"}
+};
+
+
+function showDisasterEffect(name,targetId,detail,damage,affectedTiles=[]){
+ const layer=$("disasterFX");
+ const icons={Drought:"☀️　🌵　☀️",Flood:"🌊　💧　🌊",Wildfire:"🔥　🔥　🔥",Earthquake:"〰️　🪨　〰️",Cyclone:"🌪️　💨　🌪️",Heatwave:"☀️　🔥　☀️",Landslide:"⛰️　🪨　🌿"};
+ document.querySelectorAll(".hex").forEach(el=>el.classList.remove("severity-minor","severity-severe","severity-fatal","disaster-target"));
+ affectedTiles.forEach(({id,severity})=>{
+  const tile=document.querySelector(`.hex[onclick="selectHex(${id})"]`);
+  if(tile)tile.classList.add("severity-"+severity.toLowerCase());
+ });
+ if(targetId!==null&&targetId!==undefined){
+  const tile=document.querySelector(`.hex[onclick="selectHex(${targetId})"]`);
+  if(tile)tile.classList.add("disaster-target");
+ }
+ layer.className="";
+ layer.classList.add("active",name.toLowerCase().replace(/[^a-z]/g,""));
+ layer.innerHTML=`<div class="disaster-scrim"></div><div class="disaster-wash"></div><div class="disaster-particles">${icons[name]||"⚠️"}</div><div class="disaster-banner"><strong>${esc(name)}!</strong><span>${esc(detail||"A disaster has struck the territory.")}</span></div>`;
+ const legend=document.createElement("div");
+ legend.className="disaster-legend";
+ legend.textContent="GREEN · MINOR     YELLOW · SEVERE     RED · FATAL";
+ layer.appendChild(legend);
+ clearTimeout(window.disasterFxTimer);
+ window.disasterFxTimer=setTimeout(()=>{
+  layer.className="";layer.innerHTML="";
+  document.querySelectorAll(".hex").forEach(el=>el.classList.remove("severity-minor","severity-severe","severity-fatal","disaster-target"));
+ },3600);
+}
+function resolveDisaster(forcedName=null){
+ if(!forcedName&&!state.disasterDeck.length){
+  state.disasterDeck=shuffle(["Drought","Flood","Wildfire","Earthquake","Cyclone","Heatwave","Landslide","Plague","Locust Swarm","Drought","Flood","Wildfire","Cyclone","Heatwave","Plague"]);
+  addLog("The disaster deck was reshuffled.");
+ }
+ const name=forcedName||state.disasterDeck.pop();
+ let affected=state.tiles.filter(t=>t.owner!==null&&!t.ruined&&HAZARDS[name][t.terrain]!=="Immune");
+ if(state.difficulty==="gentle")affected=affected.filter(t=>HAZARDS[name][t.terrain]!=="Fatal");
+ if(!affected.length){
+  state.lastDisaster={name,description:"No owned territory was affected by this event.",target:"No eligible hex"};
+  showDisasterEffect(name,null,"No eligible territory was affected.",null,[]);
+  addLog(`${name}: no owned territories were affected.`);return;
+ }
+ const t=affected[rand(affected.length)],damage=HAZARDS[name][t.terrain],owner=state.players[t.owner];
+ const impactTiles=affected.map(tile=>({id:tile.id,severity:HAZARDS[name][tile.terrain]}));
+ const SDG_DISASTER_LOSS={Drought:1,Flood:3,Plague:2,"Locust Swarm":1};
+ let description="";
+ if(owner.shields>0&&confirm(`${name} (${damage}) threatens ${owner.name}'s ${t.terrain} hex ${t.id+1}. Use one disaster shield to cancel it?`)){
+  owner.shields--;description="The owner used a shield. The disaster was cancelled.";
+  state.lastDisaster={name,description,target:`${owner.name} · Hex ${t.id+1}`};
+  showDisasterEffect(name,t.id,description,damage,impactTiles);
+  addLog(`${owner.name} used a shield to cancel ${name} on hex ${t.id+1}.`);return;
+ }
+ const lostTrack=SDG_DISASTER_LOSS[name];
+ if(lostTrack!==undefined){
+  owner.sdg[lostTrack]=Math.max(0,owner.sdg[lostTrack]-1);
+  addLog(`${name}: ${owner.name} loses 1 point in ${SDG_NAMES[lostTrack]}.`);
+  if(owner.sdg[lostTrack]===0){
+   owner.eliminated=true;
+   addLog(`${owner.name} has been eliminated because ${SDG_NAMES[lostTrack]} reached 0.`);
+  }
+ }
+ if(damage==="Minor"){
+  t.exhausted=Math.max(t.exhausted,2);description="Minor damage: this territory is exhausted for two rounds.";
+  addLog(`${name}: hex ${t.id+1} (${t.terrain}) is exhausted for two rounds.`);
+ }else if(damage==="Severe"){
+  if(t.building==="Farm"||t.building==="Water Treatment Plant"){
+   const lost=t.building;t.building=null;
+   const idx=SDG_INDEX[lost];if(idx!==undefined)owner.sdg[idx]=Math.max(0,owner.sdg[idx]-1);
+   description=`Severe damage: ${lost} was destroyed and its SDG point was lost.`;
+   addLog(`${name}: ${lost} destroyed on hex ${t.id+1}; its matching SDG score falls by 1.`);
+  }else{
+   t.exhausted=Math.max(t.exhausted,2);description="Severe damage: no eligible production building was present, so the territory is exhausted for two rounds.";
+   addLog(`${name}: hex ${t.id+1} is exhausted for two rounds.`);
+  }
+ }else{
+  if(t.building&&SDG_INDEX[t.building]!==undefined)owner.sdg[SDG_INDEX[t.building]]=Math.max(0,owner.sdg[SDG_INDEX[t.building]]-1);
+  t.building=null;t.ruined=true;t.exhausted=0;
+  description="Fatal damage: the territory is ruined and unusable for the rest of the game.";
+  addLog(`${name}: hex ${t.id+1} suffered fatal damage and is unusable for the rest of the game.`);
+ }
+ state.lastDisaster={name,description,target:`${owner.name} · ${t.terrain} · Hex ${t.id+1} · ${damage}`};
+ showDisasterEffect(name,t.id,description,damage,impactTiles);
+}
+function build(name){
+ const p=current(),t=state.tiles[selectedHex??-1];
+ if(!state.rolled)return toast("Roll the dice before taking actions.");
+ if(state.builds>=2)return toast("You have used both builds this turn.");
+ if(!t)return toast("Select a territory first.");
+ if(t.owner!==state.turn||t.ruined||t.exhausted>0)return toast("Choose an active territory you own.");
+ if(!canPay(p,COST[name]))return toast("Not enough resources.");
+ if(name==="City"){
+  if(t.building!=="Settlement")return toast("A City upgrades one of your Settlements.");
+ }else{
+  if(t.building)return toast("This hex already has a building.");
+  if(!BUILD_TERRAINS[name].includes(t.terrain))return toast(`${name} cannot be built on ${t.terrain}.`);
+  if(name==="Settlement"&&state.tiles.some(x=>x.building==="Settlement"&&adjacent(x.id,t.id)))return toast("Settlements must be at least two hex edges apart.");
+ }
+ pay(p,COST[name]);
+ if(name==="City")t.building="City";else t.building=name;
+ if(SDG_INDEX[name]!==undefined)score(p,SDG_INDEX[name],1);
+ state.builds++;addLog(`${p.name} built ${name} on hex ${t.id+1}${SDG_INDEX[name]!==undefined?` (+1 ${SDG_NAMES[SDG_INDEX[name]]})`:""}.`);
+ checkVictory();render();toast(name+" built.");
+}
+function convertFoodToSDG2(){
+ const p=current();
+ if(!state.rolled)return toast("Roll the dice before converting Food.");
+ if(state.foodConverted)return toast("You have already converted Food this turn.");
+ if(p.res.Food<3)return toast("You need 3 Food to gain 1 SDG 2 point.");
+ p.res.Food-=3;
+ score(p,1,1);
+ state.foodConverted=true;
+ addLog(`${p.name} converted 3 Food into +1 SDG 2.`);
+ checkVictory();render();toast("+1 SDG 2 gained.");
+}
+function adjacentOwned(hexId,playerId){return state.tiles.some(t=>t.owner===playerId&&adjacent(t.id,hexId));}
+function claimTerritory(){
+ if(!state.rolled)return toast("Roll first.");
+ if(state.territoryUsed)return toast("Territory action already used.");
+ const t=state.tiles[selectedHex??-1],p=current();
+ if(!t)return toast("Select a hex.");
+ if(t.owner!==null||t.ruined)return toast("Select an unowned, usable hex.");
+ if(!adjacentOwned(t.id,state.turn))return toast("The hex must border your territory.");
+ const cost={Money:1,Timber:1};if(!canPay(p,cost))return toast("Claiming costs 1 Money + 1 Timber.");
+ pay(p,cost);t.owner=state.turn;p.territory++;state.territoryUsed=true;
+ addLog(`${p.name} claimed unowned hex ${t.id+1}.`);render();toast("Territory claimed.");
+}
+function challengeTerritory(){
+ if(!state.rolled)return toast("Roll first.");
+ if(state.territoryUsed)return toast("Territory action already used.");
+ const t=state.tiles[selectedHex??-1],attacker=current();
+ if(!t)return toast("Select a hex.");
+ if(t.owner===null||t.owner===state.turn)return toast("Select an opponent-owned hex.");
+ if(t.ruined||t.building)return toast("You can only challenge an opponent's empty hex.");
+ if(!adjacentOwned(t.id,state.turn))return toast("The hex must border your territory.");
+ const cost={Minerals:2,Money:2};if(!canPay(attacker,cost))return toast("You need at least 2 Minerals + 2 Money in case the challenge fails.");
+ const defender=state.players[t.owner];
+ openDialog(`<h2>Territory challenge</h2><p><b>${esc(attacker.name)}</b> challenges <b>${esc(defender.name)}</b> for hex ${t.id+1}.</p><p>Spin the wheel. If it lands on <b>CONQUERED</b>, you take the land. If it lands on <b>FAILED</b>, you lose 2 Minerals and 2 Money.</p><div id="challengeWheel" style="width:210px;height:210px;border-radius:50%;margin:18px auto;background:conic-gradient(#20a36b 0deg 180deg,#d94b4b 180deg 360deg);border:8px solid #18324b;display:grid;place-items:center;position:relative;box-shadow:0 5px 18px #102a4333;transition:transform 3.2s cubic-bezier(.12,.72,.12,1)"><div style="width:92px;height:92px;border-radius:50%;background:#fff;display:grid;place-items:center;text-align:center;font-weight:900;color:#18324b;font-size:12px">SPIN<br>TO WIN</div><span style="position:absolute;top:8px;left:50%;transform:translateX(-50%);font-size:12px;font-weight:900;color:white;text-shadow:0 1px 3px #333">CONQUERED</span><span style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-size:12px;font-weight:900;color:white;text-shadow:0 1px 3px #333">FAILED</span></div><p id="challengeResult" class="muted" style="text-align:center">Ready to spin.</p>`,
+ [{text:"Cancel",cls:"secondary",fn:closeDialog},{text:"SPIN THE WHEEL",cls:"red",fn:()=>spinChallengeWheel(t,attacker,defender,cost)}]);
+}
+function spinChallengeWheel(t,attacker,defender,cost){
+ const spinBtn=[...$("dialogActions").querySelectorAll("button")].find(b=>b.textContent==="SPIN THE WHEEL");
+ if(!spinBtn||spinBtn.disabled)return;
+ spinBtn.disabled=true;
+ const conquered=rand(2)===0;
+ const wheel=$("challengeWheel"),result=$("challengeResult");
+ const finalAngle=(conquered?90:270)+360*(5+rand(3));
+ wheel.style.transform=`rotate(${finalAngle}deg)`;
+ result.textContent="The wheel is spinning...";
+ setTimeout(()=>{
+  state.territoryUsed=true;
+  if(conquered){
+   t.owner=state.turn;attacker.territory++;defender.territory--;
+   addLog(`${attacker.name} spun CONQUERED and took hex ${t.id+1} from ${defender.name}.`);
+   result.textContent="CONQUERED! You now own this land.";
+   toast("Challenge won! Land conquered.");
+  }else{
+   pay(attacker,cost);
+   addLog(`${attacker.name} spun FAILED and lost 2 Minerals + 2 Money challenging hex ${t.id+1}.`);
+   result.textContent="FAILED! You lost 2 Minerals and 2 Money. The opponent keeps the land.";
+   toast("Challenge failed. 2 Minerals + 2 Money lost.");
+  }
+  render();
+  spinBtn.textContent="DONE";spinBtn.disabled=false;spinBtn.onclick=closeDialog;
+ },3300);
+}
+function playerTrade(){
+ if(!state.rolled)return toast("Roll first.");
+ const p=current(),other=state.players[+$("tradePlayer").value];
+ if(!other)return toast("Choose another player.");
+ const give=$("offerResource").value,want=$("wantResource").value;
+ const q1=Math.max(1,Math.floor(+$("offerQty").value)),q2=Math.max(1,Math.floor(+$("wantQty").value));
+ if(give===want)return toast("Choose different resources.");
+ if(p.res[give]<q1||other.res[want]<q2)return toast("One player does not have enough resources.");
+ openDialog(`<h2>Trade proposal</h2><p><b>${esc(p.name)}</b> offers <b>${q1} ${give}</b> to <b>${esc(other.name)}</b>.</p><p>In return, ${esc(other.name)} gives <b>${q2} ${want}</b>.</p><p>Pass the device to ${esc(other.name)} to accept or reject.</p>`,
+ [{text:"Reject",cls:"secondary",fn:()=>{closeDialog();addLog(`${other.name} rejected a trade with ${p.name}.`);}},{text:"Accept trade",cls:"green",fn:()=>{closeDialog();if(p.res[give]<q1||other.res[want]<q2)return toast("Trade no longer possible.");p.res[give]-=q1;other.res[give]+=q1;other.res[want]-=q2;p.res[want]+=q2;addLog(`${p.name} and ${other.name} completed a trade.`);render();}}]);
+}
+function buyDevelopment(){
+ if(!state.rolled)return toast("Roll first.");
+ const p=current(),cost={Food:1,Minerals:1,Money:1};
+ if(!canPay(p,cost))return toast("Development card costs 1 Food + 1 Mineral + 1 Money.");
+ if(!state.deck.length)return toast("Development deck is empty.");
+ pay(p,cost);const card=state.deck.pop();p.hand.push(card);addLog(`${p.name} bought a development card.`);render();toast("Development card added to hand.");
+}
+function playCard(index){
+ if(!state.rolled)return toast("Roll first.");
+ const p=current(),card=p.hand[index];if(!card)return;
+ card.effect(p);p.hand.splice(index,1);
+ state.playedCards.push({player:p.name,name:card.name});
+ addLog(`${p.name} played ${card.name}: ${card.desc}`);checkVictory();render();
+}
+function playDevelopment(){
+ if(!state.rolled)return toast("Roll first.");
+ const p=current();if(!p.hand.length)return toast("You have no development cards.");
+ openDialog(`<h2>Play a development card</h2>${p.hand.map((c,i)=>`<div class="cardrow"><span><b>${esc(c.name)}</b><br><span class="muted">${esc(c.desc)}</span></span><button class="btn small" onclick="closeDialog();playCard(${i})">Play</button></div>`).join("")}`,
+ [{text:"Close",cls:"secondary",fn:closeDialog}]);
+}
+function endTurn(){
+ if(!state.rolled)return toast("Roll the dice before ending your turn.");
+ if(state.winner)return;
+ const old=current();state.tiles.forEach(t=>{if(t.exhausted>0)t.exhausted--;});
+ state.turn=(state.turn+1)%state.players.length;
+ let checked=0;
+ while(state.players[state.turn].eliminated&&checked<state.players.length){state.turn=(state.turn+1)%state.players.length;checked++;}
+ if(state.turn===0)state.round++;
+ if(state.players.filter(p=>!p.eliminated).length<=1){
+  const survivor=state.players.find(p=>!p.eliminated);
+  state.winner=survivor||null;
+  if(survivor)addLog(`${survivor.name} wins: all other players were eliminated.`);
+ }
+ state.rolled=false;state.builds=0;state.territoryUsed=false;state.tradeUsed=false;state.foodConverted=false;selectedHex=null;
+ $("dieA").textContent="—";$("dieB").textContent="—";$("rollText").textContent="Roll to begin your turn";
+ addLog(`${old.name} ended their turn. ${current().name} is next.`);
+ render();toast("Pass the device to "+current().name+".");
+}
+function checkVictory(){
+ const winner=state.players.find(p=>!p.eliminated&&p.sdg.every(v=>v>=10));
+ if(winner&&!state.winner){state.winner=winner;addLog(`${winner.name} completed all four SDG tracks and won TERRA NOVA!`);$("endTurnBtn").disabled=true;$("rollBtn").disabled=true;render();}
+}
+function openDialog(html,buttons){
+ $("dialogBody").innerHTML=html;$("dialogActions").innerHTML="";
+ buttons.forEach(b=>{const btn=document.createElement("button");btn.className="btn "+(b.cls||"");btn.textContent=b.text;btn.onclick=b.fn;$("dialogActions").appendChild(btn);});
+ $("overlay").style.display="flex";
+}
+function closeDialog(){$("overlay").style.display="none";}
+$("overlay").addEventListener("click",e=>{if(e.target===$("overlay"))closeDialog();});
+const DEV_PASSCODE="112806";
+const DEV_DISASTERS=["Drought","Flood","Wildfire","Earthquake","Cyclone","Heatwave","Landslide","Plague","Locust Swarm"];
+function openDeveloperLock(){
+ openDialog(`<h2>Developer panel</h2><p class="muted">Enter the passcode to unlock disaster testing tools.</p><label for="devPasscode">Passcode</label><input id="devPasscode" type="password" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="6-digit passcode" style="width:100%;margin:8px 0 12px" onkeydown="if(event.key==='Enter')unlockDeveloperPanel()">`,
+ [{text:"Unlock",fn:unlockDeveloperPanel},{text:"Cancel",cls:"secondary",fn:closeDialog}]);
+}
+function unlockDeveloperPanel(){
+ const input=$("devPasscode");
+ if(!input||input.value!==DEV_PASSCODE){toast("Incorrect passcode.");if(input){input.value="";input.focus();}return;}
+ openDeveloperPanel();
+}
+function openDeveloperPanel(){
+ if(!state){closeDialog();toast("Start a game before testing disasters.");return;}
+ openDialog(`<h2>Developer panel</h2><p class="muted">Test a disaster against a randomly selected eligible owned hex. The normal disaster effects and shield prompt apply. Testing does not remove a card from the disaster deck.</p><label for="devDisaster">Choose disaster</label><select id="devDisaster" style="width:100%;margin:8px 0 12px">${DEV_DISASTERS.map(n=>`<option value="${n}">${n}</option>`).join("")}</select><p class="muted">This test changes the current game state, including territory damage and SDG penalties. Use a spare game to experiment.</p>`,
+ [{text:"Test disaster",fn:()=>{
+   const name=$("devDisaster")?.value;
+   if(!name||!HAZARDS[name])return toast("Choose a valid disaster.");
+   closeDialog();
+   resolveDisaster(name);
+   render();
+   checkVictory();
+  }},{text:"Lock panel",cls:"secondary",fn:closeDialog}]);
+}
+function showRules(){
+ openDialog(`<h2>Quick rules</h2>
+ <p><b>Starting scores:</b> Every player begins with 2 points in each of SDG 1, 2, 3 and 6. A player is eliminated if any track reaches 0.</p><p><b>Goal:</b> first player to reach 10 points in all four tracks: SDG 1, 2, 3 and 6.</p>
+ <p><b>Turn:</b> roll two dice → collect production (or disaster on 7) → trade → build up to 2 → one territory action → play/buy development card → end turn.</p>
+ <p><b>Four building types:</b><br>Settlement: 1 Food + 2 Timber + 1 Money; +1 SDG 1; produces 1 resource.<br>Farm: 1 Water + 1 Timber + 1 Money; +1 SDG 2; +1 Food on activation.<br>Hospital: 1 Water + 1 Timber + 2 Minerals + 1 Money + 1 Medicine; +1 SDG 3 when built; when built.<br>Water Treatment Plant: 2 Timber + 1 Mineral + 1 Money; +1 SDG 6; +1 Water on activation. Grassland produces Medicine.<br>City: 1 Food + 2 Timber + 2 Minerals + 2 Medicine; upgrades Settlement; produces 2 resources; no SDG point.</p>
+ <p><b>Territory:</b> claim an adjacent empty hex for 1 Money + 1 Timber. Challenge an adjacent opponent-owned empty hex for 2 Minerals + 2 Money; each rolls a die, high roll wins, ties favour defender. Defender may pay 1 Mineral + 1 Money for +1.</p>
+ <p><b>Cards:</b> Buy a development card for 1 Food + 1 Mineral + 1 Money, then play a card from your hand after rolling. Rolling 7 draws the next card from the shuffled disaster deck; the drawn card is displayed in the card table.</p><p><b>SDG disaster penalties:</b> Drought −1 SDG 1; Flood −1 SDG 6; Plague −1 SDG 3; Locust Swarm −1 SDG 2. Other disasters damage or exhaust territories but do not directly reduce SDG scores. A disaster shield cancels the event and its score penalty.</p><p><b>Disasters:</b> Disasters can damage territories and reduce SDG scores. If any SDG score reaches 0, that player is eliminated.</p>
+ <p><b>Important:</b> only the owner of a building scores its SDG point. Territory capture does not transfer buildings or SDG points.</p>`,
+ [{text:"Got it",cls:"",fn:closeDialog}]);
+}
+function clearLog(){state.log=[];renderLog();}
+</script>
+</body>
+</html>
